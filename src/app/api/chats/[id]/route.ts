@@ -1,17 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import dayjs from 'dayjs';
 import { getChatById } from '@/lib/api/db';
+import { withSessionHandler } from '@/modules/auth/server/with-session-handler';
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
+type Params = {
+  id: string;
+};
 
 export const dynamic = 'force-dynamic';
 
-export const GET = async (_: NextRequest, { params }: Params): Promise<NextResponse> => {
-  const chat = await getChatById(params.id, {
+export const GET = withSessionHandler<Params>(async ({ context }): Promise<NextResponse> => {
+  if (!context) {
+    return NextResponse.json({ error: 'Context is not defined' }, { status: 404 });
+  }
+
+  const { id } = context.params;
+
+  const chat = await getChatById(id, {
     messages: {
       include: {
         author: {
@@ -24,7 +29,9 @@ export const GET = async (_: NextRequest, { params }: Params): Promise<NextRespo
     },
   });
 
-  if (!chat) return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
+  if (!chat) {
+    return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
+  }
 
   const { messages = [], ...chatData } = chat;
 
@@ -39,4 +46,4 @@ export const GET = async (_: NextRequest, { params }: Params): Promise<NextRespo
   };
 
   return NextResponse.json(normalizedChat);
-};
+});
