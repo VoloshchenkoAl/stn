@@ -9,14 +9,14 @@ import { ChatListActions } from './chat-list-actions';
 import styles from './chat-list.module.scss';
 
 export const ChatList: FC = async () => {
-  const chatsPromise = await fetch(`${process.env.APP_HOST}/api/chats`, {
-    headers: headers(),
-  }).then((res) => res.json() ?? []);
-  const categoriesPromise = await fetch(`${process.env.APP_HOST}/api/categories`, {
-    headers: headers(),
-  }).then((res) => res.json());
-
-  const [chats, categories] = await Promise.all([chatsPromise, categoriesPromise]);
+  const [chats, categories] = await Promise.all([
+    fetch(`${process.env.APP_HOST}/api/chats`, {
+      headers: headers(),
+    }).then((res) => res.json() ?? []),
+    fetch(`${process.env.APP_HOST}/api/categories`, {
+      headers: headers(),
+    }).then((res) => res.json()),
+  ]);
 
   return (
     <>
