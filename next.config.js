@@ -1,10 +1,16 @@
 const { withSentryConfig } = require('@sentry/nextjs');
 
-module.exports = withSentryConfig(
-  {
-    images: { unoptimized: true },
-    output: 'standalone',
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: { unoptimized: true },
+  output: 'standalone',
+  experimental: {
+    serverComponentsExternalPackages: ['shiki'],
   },
+};
+
+module.exports = withSentryConfig(
+  nextConfig,
   {
     // For all available options, see:
     // https://github.com/getsentry/sentry-webpack-plugin#options

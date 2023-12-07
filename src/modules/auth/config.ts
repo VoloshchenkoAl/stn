@@ -19,11 +19,11 @@ export const authConfig: NextAuthConfig = {
         return NextResponse.redirect(`${process.env.APP_HOST}/`);
       }
 
-      if (isProtectedRoute) {
-        return isLoggedIn;
+      if (isProtectedRoute && !isLoggedIn) {
+        return NextResponse.redirect(`${process.env.APP_HOST}/`);
       }
 
-      return true;
+      return NextResponse.next();
     },
   },
 };

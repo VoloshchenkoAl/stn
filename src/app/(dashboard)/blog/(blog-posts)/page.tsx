@@ -1,9 +1,12 @@
 import React from 'react';
 import { Metadata, NextPage } from 'next';
+import { headers } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
+import * as Sentry from '@sentry/nextjs';
 import { PostList, PostListItem } from '@stn-ui/blog';
 import { getAllPosts } from '@/lib/api/blog';
+import { ContentType } from '@/lib/api/blog/blog.api-types';
 
 export const metadata: Metadata = {
   title: {
@@ -14,7 +17,18 @@ export const metadata: Metadata = {
 };
 
 const Blog: NextPage = async () => {
-  const posts = await getAllPosts();
+  const posts = await (async (): Promise<ContentType[]> => {
+    'use server';
+
+    return Sentry.withServerActionInstrumentation(
+      'getBlogPosts',
+      {
+        headers: headers(),
+        recordResponse: true,
+      },
+      async () => getAllPosts(),
+    );
+  })();
 
   return (
     <PostList>
